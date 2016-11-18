@@ -4,24 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
+
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
+import java.util.Iterator;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 
 public class GiveAPI implements Runnable {
@@ -37,7 +31,21 @@ public class GiveAPI implements Runnable {
 	public void run() {
 		AutoDonor._log.info("[AutoDonor] Running as scheduled.");
 		JSONObject donorList = getDonorList();
-		
+		JSONArray donations = (JSONArray) donorList.get("donations");
+        Iterator i = donations.iterator();
+        JSONParser jsonParser = new JSONParser();
+        while (i.hasNext()) {
+        	String gulpingJSON = (String) i.next();
+        	JSONObject donation;
+        	try {
+				donation = (JSONObject) jsonParser.parse(gulpingJSON);
+			} catch (ParseException e) {
+				AutoDonor._log.info("[AutoDonor] Got a weird, malformed donation JSON array within API response. Skipping.");
+				continue;
+			}
+        	donation.get("payment_meta");
+        	int ID = (int) donation.get("ID");
+        }
 		
 		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
 		//_plugin.setDonorStatus(true, "Protocol_7");

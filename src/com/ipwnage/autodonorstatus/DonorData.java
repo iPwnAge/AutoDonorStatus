@@ -31,11 +31,13 @@ public class DonorData {
 	
 	public boolean isDonor() {
 		/* 
+		 * if their days is 0, that means permanently donor (e.g. they bought donor status)
+		 * 
 		 * math logic: take the current unix time, subtract the original purchase date unix time, 
 		 * and see if that's less than the amount of whole-digit days, times the amount of seconds
 		 * in a day.
 		*/
-	    if (((int) (System.currentTimeMillis() / 1000) - _date) < (86400 * _days)) {
+	    if (_days == 0 || ((int) (System.currentTimeMillis() / 1000) - _date) < (86400 * _days)) {
 	    	return true;
 	    }
 	    return false;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,7 +25,7 @@ public class AutoDonor extends JavaPlugin {
 	private File _config = new File(getDataFolder(), "config.yml");
 	File _dataFile = new File(getDataFolder(), "data.yml");
 	FileConfiguration _data = new YamlConfiguration();
-	private HashMap<UUID, DonorData> _donorData = new HashMap<UUID, DonorData>();
+	private ConcurrentHashMap<UUID, DonorData> _donorData = new ConcurrentHashMap<UUID, DonorData>();
 	public static Permission _permissions;
 	private int _checkInterval = 15 * 20;
 	private int _giveAPI;
