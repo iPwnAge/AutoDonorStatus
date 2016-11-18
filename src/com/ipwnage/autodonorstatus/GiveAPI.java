@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -22,7 +26,6 @@ import com.google.gson.JsonParser;
 
 public class GiveAPI implements Runnable {
 	
-	private static final CookieHandler COOKIE_MANAGER = new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER);
 	private AutoDonor _plugin;
 	
 	
@@ -33,15 +36,15 @@ public class GiveAPI implements Runnable {
 	@Override
 	public void run() {
 		AutoDonor._log.info("[AutoDonor] Running as scheduled.");
-		JsonArray donorList = getDonorList();
-		AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
+		JSONObject donorList = getDonorList();
+		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
 		//_plugin.setDonorStatus(true, "Protocol_7");
 		
 	}
 	
 	
 	
-	public JsonArray getDonorList() {
+	public JSONObject getDonorList() {
 
 		String serverResponse;
 
@@ -56,7 +59,13 @@ public class GiveAPI implements Runnable {
 			return null;
 		}
 		
-		return new JsonParser().parse(serverResponse).getAsJsonArray();
+		JSONParser jsonParser = new JSONParser();
+		try {
+			return (JSONObject) jsonParser.parse(serverResponse);
+		} catch (ParseException e) {
+			AutoDonor._log.info("[AutoDonor] Got non-valid response from iPwnAge Donation API!");
+			return null;
+		}
 
 	}
 	
@@ -76,13 +85,6 @@ public class GiveAPI implements Runnable {
 		con.setRequestProperty("Connection", "close");
 		con.setRequestProperty("User-Agent", "AutoDonor");
 
-		for (Map.Entry<String, List<String>> pair : COOKIE_MANAGER.get(uri, con.getRequestProperties()).entrySet()) {
-			String key = pair.getKey();
-
-			for (String cookie : pair.getValue())
-				con.addRequestProperty(key, cookie);
-
-		}
 
 		InputStream serverResponseStream;
 
@@ -94,8 +96,6 @@ public class GiveAPI implements Runnable {
 
 		if (serverResponseStream == null)
 			return "";
-
-		COOKIE_MANAGER.put(uri, con.getHeaderFields());
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(serverResponseStream));
 
