@@ -2,7 +2,9 @@ package com.ipwnage.autodonorstatus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -28,6 +30,7 @@ public class AutoDonor extends JavaPlugin {
 	private ConcurrentHashMap<UUID, DonorData> _donorData = new ConcurrentHashMap<UUID, DonorData>();
 	public static Permission _permissions;
 	private int _checkInterval = 15 * 20;
+	List<Integer> _proccessedPayments;
 	private int _giveAPI;
 	String _apiURL = "";
 	
@@ -52,6 +55,8 @@ public class AutoDonor extends JavaPlugin {
 			for (String key : _data.getConfigurationSection("players").getKeys(false)) {
 				_donorData.put(UUID.fromString(key), new DonorData((String) _data.get("players."+key)));
 				}
+			
+			_proccessedPayments = List<Integer>. _data.getList("processed_ids");
 			getLogger().info("Loaded " + _donorData.size() + " player's donation data.");
 		} catch (IOException e) {
 			getLogger().info("Didn't find a data file, making one now.");
@@ -76,6 +81,22 @@ public class AutoDonor extends JavaPlugin {
 		_giveAPI = this.getServer().getScheduler().runTaskTimerAsynchronously(this, new GiveAPI(this), _checkInterval, _checkInterval).getTaskId(); 
 		getLogger().info("Successfully started AutoDonor.");
 		return;
+	}
+	
+	@Override
+	public void onDisable() {
+		saveConfig();
+		for (Object key : _donorData.keySet()) {
+			_data.set("players."+key, _donorData.get(key).toString());
+			}
+		_data.set("processed_ids", _proccessedPayments.toString());
+		try {
+			_data.save(_dataFile);
+		} catch (IOException e) {
+			getLogger().severe("Couldn't save the Donor Data file. This isn't good");
+			e.printStackTrace();
+		}
+		getLogger().severe("All Donor Data and configuration values saved.");
 	}
 	
 	@SuppressWarnings("deprecation")

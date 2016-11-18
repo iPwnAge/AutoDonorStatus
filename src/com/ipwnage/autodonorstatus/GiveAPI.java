@@ -16,6 +16,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import static java.lang.Math.toIntExact;
+
 
 
 public class GiveAPI implements Runnable {
@@ -35,10 +37,16 @@ public class GiveAPI implements Runnable {
         Iterator<JSONObject> i = donations.iterator();
         while (i.hasNext()) {
         	JSONObject donation = i.next();
-        	_plugin.getLogger().info("Got this donor ID from donor list: " + donation.get("ID"));
+        	int paymentId = toIntExact((Long) donation.get("ID"));
+        	JSONObject paymentMeta = (JSONObject)  donation.get("payment_meta");
+        	String paymentUsername = (String) paymentMeta.get("username");
+        	_plugin.getLogger().info("Got this donor ID from donor list: " + paymentId);
         	JSONObject payment_meta = (JSONObject)  donation.get("payment_meta");
-        	_plugin.getLogger().info("Got this username from donor list: " + payment_meta.get("username"));
-        	
+        	_plugin.getLogger().info("Got this username from donor list: " + paymentUsername);
+        	if (!_plugin._proccessedPayments.contains(paymentId)) {
+        		_plugin._proccessedPayments.add(paymentId);
+        		_plugin.getLogger().info("Added them to the data store");
+        	}
         }
 		
 		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
