@@ -1,0 +1,5 @@
+name: AutoDonor
+version: 0.1
+author: Proplex (David Lohle)
+description: iPwnAge Network automatic donor status
+main: com.ipwnage.autodonorstatus.AutoDonor

@@ -1,0 +1,7 @@
+#Incredibly quick plugin written by Proplex (https://github.com/Proplex)
+
+#How long (in seconds) the plugin waits to check the API.
+checkInterval: 15
+
+#Give API to access
+apiURL: ""
