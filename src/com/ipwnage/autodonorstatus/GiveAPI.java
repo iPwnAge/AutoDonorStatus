@@ -37,6 +37,8 @@ public class GiveAPI implements Runnable {
 	public void run() {
 		AutoDonor._log.info("[AutoDonor] Running as scheduled.");
 		JSONObject donorList = getDonorList();
+		
+		
 		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
 		//_plugin.setDonorStatus(true, "Protocol_7");
 		
