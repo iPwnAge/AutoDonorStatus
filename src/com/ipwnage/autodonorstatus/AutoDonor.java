@@ -35,7 +35,7 @@ public class AutoDonor extends JavaPlugin {
 	public void onEnable() {
 		//Check for Vault. We need Vault for checking PEX groups.
 		if(getServer().getPluginManager().getPlugin("Vault") == null){
-			_log.severe((String.format("[AutoDonor] Your server doesn't have Vault installed. Disabling plugin.")));
+			getLogger().severe((String.format("Your server doesn't have Vault installed. Disabling plugin.")));
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
@@ -43,7 +43,7 @@ public class AutoDonor extends JavaPlugin {
 		//Create the config on new install
 		if(!_config.exists()) {
 			this.saveDefaultConfig();
-			_log.info("[AutoDonor] Didn't find an AutoDonor configuration. Making one now.");
+			getLogger().info("Didn't find an AutoDonor configuration. Making one now.");
 		}
 		
 		//Load the data file, otherwise create it. Also throw a nasty warning if we can't load the existing data file.
@@ -74,7 +74,7 @@ public class AutoDonor extends JavaPlugin {
 		
 		//Async task for checking the web API
 		_giveAPI = this.getServer().getScheduler().runTaskTimerAsynchronously(this, new GiveAPI(this), _checkInterval, _checkInterval).getTaskId(); 
-		_log.info("[AutoDonor] Successfully started AutoDonor.");
+		getLogger().info("Successfully started AutoDonor.");
 		return;
 	}
 	
@@ -82,7 +82,7 @@ public class AutoDonor extends JavaPlugin {
 	public void setDonorStatus(Boolean status, String playerName) {
 		OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
 		String rank = _permissions.getPrimaryGroup(null, player);
-		_log.info("[AutoDonor] This player is ranked " + rank);
+		getLogger().info("This player is ranked " + rank);
 	}
 
 	

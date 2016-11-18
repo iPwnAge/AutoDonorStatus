@@ -29,22 +29,16 @@ public class GiveAPI implements Runnable {
 	
 	@Override
 	public void run() {
-		AutoDonor._log.info("[AutoDonor] Running as scheduled.");
+		_plugin.getLogger().info("[AutoDonor] Running as scheduled.");
 		JSONObject donorList = getDonorList();
 		JSONArray donations = (JSONArray) donorList.get("donations");
-        Iterator i = donations.iterator();
-        JSONParser jsonParser = new JSONParser();
+        Iterator<JSONObject> i = donations.iterator();
         while (i.hasNext()) {
-        	String gulpingJSON = (String) i.next();
-        	JSONObject donation;
-        	try {
-				donation = (JSONObject) jsonParser.parse(gulpingJSON);
-			} catch (ParseException e) {
-				AutoDonor._log.info("[AutoDonor] Got a weird, malformed donation JSON array within API response. Skipping.");
-				continue;
-			}
-        	donation.get("payment_meta");
-        	int ID = (int) donation.get("ID");
+        	JSONObject donation = i.next();
+        	_plugin.getLogger().info("Got this donor ID from donor list: " + donation.get("ID"));
+        	JSONObject payment_meta = (JSONObject)  donation.get("payment_meta");
+        	_plugin.getLogger().info("Got this username from donor list: " + payment_meta.get("username"));
+        	
         }
 		
 		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
@@ -61,11 +55,11 @@ public class GiveAPI implements Runnable {
 		try {
 			serverResponse = sendGet(_plugin._apiURL);
 			if (serverResponse.isEmpty()) {
-				AutoDonor._log.info("[AutoDonor] Can't reach the iPwnAge Donation API!");
+				_plugin.getLogger().severe("[AutoDonor] Can't reach the iPwnAge Donation API!");
 				return null;
 			}
 		} catch (IOException | URISyntaxException e) {
-			AutoDonor._log.info("[AutoDonor] Can't reach the iPwnAge Donation API!");
+			_plugin.getLogger().severe("[AutoDonor] Can't reach the iPwnAge Donation API!");
 			return null;
 		}
 		
@@ -73,7 +67,7 @@ public class GiveAPI implements Runnable {
 		try {
 			return (JSONObject) jsonParser.parse(serverResponse);
 		} catch (ParseException e) {
-			AutoDonor._log.info("[AutoDonor] Got non-valid response from iPwnAge Donation API!");
+			_plugin.getLogger().severe("[AutoDonor] Got non-valid response from iPwnAge Donation API!");
 			return null;
 		}
 
