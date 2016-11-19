@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -51,14 +52,14 @@ public class GiveAPI implements Runnable {
         			_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
         		}
         		_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
-        		OfflinePlayer player = Bukkit.getOfflinePlayer(paymentUsername);
-        		if(player == null) { //check to see if the username has been seen on the server before. If not, we gotta do things manually.
-        			_plugin.getLogger().severe(paymentUsername + " has not been seen on the server before. Cannot process their donor status!");
+        		UUID playerUUID = getPlayerUUID(paymentUsername);
+        		if(playerUUID == null) { //submitted username doesn't have a UUID according to mojang, we can't processes.
+        			_plugin.getLogger().severe(paymentUsername + " does not have a valid UUID. Cannot process their donor status!");
         			continue;
         		}
         		DonorData playerDonorData = new DonorData((int) (System.currentTimeMillis() / 1000), 0);
-        		_plugin._donorData.put(player.getUniqueId(), playerDonorData);
-        		_plugin.setDonorStatus(true, player.getUniqueId());
+        		_plugin._donorData.put(playerUUID, playerDonorData);
+        		_plugin.setDonorStatus(true, playerUUID, paymentUsername);
         		
         	}
         }
@@ -92,7 +93,32 @@ public class GiveAPI implements Runnable {
 
 	}
 	
+	public UUID getPlayerUUID(String playerName) {
+		String serverResponse;
+		try {
+			serverResponse = sendGet("https://api.mojang.com/users/profiles/minecraft/" + playerName);
+			if (serverResponse.isEmpty()) {
+				_plugin.getLogger().severe("[AutoDonor] Can't reach the Mojang Username API!");
+				return null;
+			}
+		} catch (IOException | URISyntaxException e) {
+			_plugin.getLogger().severe("[AutoDonor] Can't reach the Mojang Username API!");
+			return null;
+		}
+		JSONParser jsonParser = new JSONParser();
+		try {
+			
+			JSONObject apiResponse = (JSONObject) jsonParser.parse(serverResponse);
+			String id = (String) apiResponse.get("id");
+			//I actually hate Mojang. Why in the world would you send me a dash-less UUID. 
+			return UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12) + "-" + id.substring(12, 16) + "-" + id.substring(16, 20) + "-" +id.substring(20, 32));
+			
+		} catch (ParseException e) {
+			_plugin.getLogger().severe("[AutoDonor] API responded with no such user!");
+			return null;
+		}
 
+	}
 	
 	private static String sendGet(String url) throws IOException, URISyntaxException {
 

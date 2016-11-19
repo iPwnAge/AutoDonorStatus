@@ -104,21 +104,22 @@ public class AutoDonor extends JavaPlugin {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void setDonorStatus(Boolean setDonor, UUID playerUUID) {
-		OfflinePlayer player = Bukkit.getOfflinePlayer(playerUUID);
-		String rank = _permissions.getPrimaryGroup(null, player);
+	public void setDonorStatus(Boolean setDonor, UUID playerUUID, String playerName) {
+		String rank = _permissions.getPrimaryGroup((String) null, playerName);
 		if(setDonor) { //set the player to donor status
 			if(!rank.startsWith("d")) { //Don't double set donor if the player donated twice.
 				if(rank.equals("normal")) {
 					rank = "commoner";
 				}
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerUUID + " group set d" + rank);
-			getLogger().info("Successfully applied donor status to the player " + player.getName() + "(" + rank + "->" + "d" + rank + ")");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerName + " group set d" + rank);
+			getLogger().info("Successfully applied donor status to the player " + playerName + "(" + rank + "->" + "d" + rank + ")");
+			} else {
+				getLogger().info("The player " + playerName + "already has donor status, ignoring.");
 			}
 		} else { //remove the player's donor status
 			if(rank.startsWith("d")) { //Don't remove the donor status if the player isn't already donor
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerUUID + " group set " + rank.substring(1, rank.length()));
-			getLogger().info("Successfully applied donor status to the player " + player.getName() + "(" + rank + "->" + "d" + rank + ")");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerName + " group set " + rank.substring(1, rank.length()));
+			getLogger().info("Successfully applied donor status to the player " + playerName + "(" + rank + "->" + "d" + rank + ")");
 			}
 		}
 		
