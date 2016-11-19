@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,7 +33,6 @@ public class GiveAPI implements Runnable {
 	
 	@Override
 	public void run() {
-		_plugin.getLogger().info("[AutoDonor] Running as scheduled.");
 		JSONObject donorList = getDonorList();
 		JSONArray donations = (JSONArray) donorList.get("donations");
         Iterator<JSONObject> i = donations.iterator();
@@ -40,17 +41,27 @@ public class GiveAPI implements Runnable {
         	int paymentId = toIntExact((Long) donation.get("ID"));
         	JSONObject paymentMeta = (JSONObject)  donation.get("payment_meta");
         	String paymentUsername = (String) paymentMeta.get("username");
-        	_plugin.getLogger().info("Got this donor ID from donor list: " + paymentId);
         	JSONObject payment_meta = (JSONObject)  donation.get("payment_meta");
-        	_plugin.getLogger().info("Got this username from donor list: " + paymentUsername);
-        	if (!_plugin._proccessedPayments.contains(paymentId)) {
-        		_plugin._proccessedPayments.add(paymentId);
-        		_plugin.getLogger().info("Added them to the data store");
+        	
+        	
+        	if (!_plugin._processedPayments.contains(paymentId)) {
+        		_plugin._processedPayments.add(paymentId);
+        		if(paymentUsername.equals("")) {
+        			//the API should've filtered this, but just in case:
+        			_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
+        		}
+        		_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
+        		OfflinePlayer player = Bukkit.getOfflinePlayer(paymentUsername);
+        		if(player == null) { //check to see if the username has been seen on the server before. If not, we gotta do things manually.
+        			_plugin.getLogger().severe(paymentUsername + " has not been seen on the server before. Cannot process their donor status!");
+        			continue;
+        		}
+        		DonorData playerDonorData = new DonorData((int) (System.currentTimeMillis() / 1000), 0);
+        		_plugin._donorData.put(player.getUniqueId(), playerDonorData);
+        		_plugin.setDonorStatus(true, player.getUniqueId());
+        		
         	}
         }
-		
-		//AutoDonor._log.info("[AutoDonor] Got this JSON: " + donorList.toString());
-		//_plugin.setDonorStatus(true, "Protocol_7");
 		
 	}
 	
