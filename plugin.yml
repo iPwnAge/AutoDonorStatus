@@ -4,8 +4,8 @@ author: Proplex (David Lohle)
 description: iPwnAge Network automatic donor status
 main: com.ipwnage.autodonorstatus.AutoDonor
 commands:
-   donor:
-      description: The command for controlling ADS in-game.
-      usage: /donor <check, removedonor, adddonor> <params>
-      permission: autodonorstatus.admin
-      permission-message: You don't have permission to
+    donor:
+        description: The command for controlling ADS in-game.
+        usage: /donor <check, removedonor, adddonor> <params>
+        permission: autodonorstatus.admin
+        permission-message: You don't have permission to
