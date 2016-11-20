@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,6 +27,7 @@ public class AutoDonor extends JavaPlugin {
 	File _dataFile = new File(getDataFolder(), "data.yml");
 	FileConfiguration _data = new YamlConfiguration();
 	ConcurrentHashMap<UUID, DonorData> _donorData = new ConcurrentHashMap<UUID, DonorData>();
+	PlayerDataCache _playerDataCache = new PlayerDataCache();
 	public static Permission _permissions;
 	private int _checkInterval = 15 * 20;
 	ArrayList<Integer> _processedPayments;
@@ -67,7 +67,10 @@ public class AutoDonor extends JavaPlugin {
 			_processedPayments =  (ArrayList<Integer>) _data.getList("processed_ids", new ArrayList<Integer>());
 			getLogger().info("Loaded " + _processedPayments.size() + " payment data.");
 			for (String key : _data.getConfigurationSection("players").getKeys(false)) {
-				_donorData.put(UUID.fromString(key), new DonorData((String) _data.get("players."+key)));
+				DonorData donorData = new DonorData((String) _data.get("players."+key));
+				UUID playerUUID = UUID.fromString(key);
+				_donorData.put(playerUUID, donorData );
+				_playerDataCache.addPlayer(playerUUID, donorData.getName());
 				}
 			getLogger().info("Loaded " + _donorData.size() + " player's donation data.");
 		} catch (NullPointerException e) {
@@ -112,14 +115,14 @@ public class AutoDonor extends JavaPlugin {
 					rank = "commoner";
 				}
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerName + " group set d" + rank);
-			getLogger().info("Successfully applied donor status to the player " + playerName + "(" + rank + "->" + "d" + rank + ")");
+			getLogger().info("Successfully applied donor status to the player " + playerName + " (" + rank + "->" + "d" + rank + ")");
 			} else {
 				getLogger().info("The player " + playerName + "already has donor status, ignoring.");
 			}
 		} else { //remove the player's donor status
 			if(rank.startsWith("d")) { //Don't remove the donor status if the player isn't already donor
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "ee pex user " + playerName + " group set " + rank.substring(1, rank.length()));
-			getLogger().info("Successfully applied donor status to the player " + playerName + "(" + rank + "->" + "d" + rank + ")");
+			getLogger().info("Successfully remove donor status from the player " + playerName + "(" + rank + "->" + rank.substring(1, rank.length()) + ")");
 			}
 		}
 		

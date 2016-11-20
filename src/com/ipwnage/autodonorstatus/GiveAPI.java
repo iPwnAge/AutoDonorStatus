@@ -12,8 +12,6 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -32,6 +30,7 @@ public class GiveAPI implements Runnable {
 		_plugin = autoDonor;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		JSONObject donorList = getDonorList();
@@ -42,14 +41,14 @@ public class GiveAPI implements Runnable {
         	int paymentId = toIntExact((Long) donation.get("ID"));
         	JSONObject paymentMeta = (JSONObject)  donation.get("payment_meta");
         	String paymentUsername = (String) paymentMeta.get("username");
-        	JSONObject payment_meta = (JSONObject)  donation.get("payment_meta");
         	
         	
         	if (!_plugin._processedPayments.contains(paymentId)) {
         		_plugin._processedPayments.add(paymentId);
         		if(paymentUsername.equals("")) {
         			//the API should've filtered this, but just in case:
-        			_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
+        			_plugin.getLogger().severe("Got an invalid username from the donation API. Skipping this.");
+        			continue;
         		}
         		_plugin.getLogger().info(paymentUsername + " just donated. Processing their donor status now.");
         		UUID playerUUID = getPlayerUUID(paymentUsername);
@@ -57,9 +56,8 @@ public class GiveAPI implements Runnable {
         			_plugin.getLogger().severe(paymentUsername + " does not have a valid UUID. Cannot process their donor status!");
         			continue;
         		}
-        		DonorData playerDonorData = new DonorData((int) (System.currentTimeMillis() / 1000), 0);
+        		DonorData playerDonorData = new DonorData(paymentUsername, (int) (System.currentTimeMillis() / 1000), 0);
         		_plugin._donorData.put(playerUUID, playerDonorData);
-        		_plugin.setDonorStatus(true, playerUUID, paymentUsername);
         		
         	}
         }

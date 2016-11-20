@@ -3,18 +3,19 @@ package com.ipwnage.autodonorstatus;
 public class DonorData {
 	private int _date;
 	private int _days;
-	
+	private String _name;
 	//Yeah, I get it. 2038 problem. If Minecraft is still a thing in 2038, I'll eat my shoe.
 	
-	public DonorData(int date, int days) {
+	public DonorData(String name, int date, int days) {
 		_date = date;
 		_days = days;
+		_name = name;
 	}
 	
 	public DonorData(String loaded) {
 		String[] saveddata = loaded.split(",");
-		_date = Integer.valueOf(saveddata[0]);
-		_days = Integer.valueOf(saveddata[1]);
+		_date = Integer.valueOf(saveddata[1]);
+		_days = Integer.valueOf(saveddata[2]);
 	}
 	
 	public int getDate() {
@@ -23,6 +24,26 @@ public class DonorData {
 	
 	public void setDate(int date) {
 		_date = date;
+	}
+	
+	public int getDays() {
+		return _days;
+	}
+
+	public String getName() {
+		return _name;
+	}
+	
+	public void setName(String name) {
+		_name = name;
+	}
+	
+	public void setDays(int days) {
+		_days = days;
+	}
+	
+	public int getDaysRemaining() {
+		return ((int) (System.currentTimeMillis() / 1000) - _date) / (86400 * _days);
 	}
 	
 	public String toString() {
