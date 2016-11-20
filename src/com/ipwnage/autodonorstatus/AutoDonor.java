@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.ipwnage.autodonorstatus.DonorData;
 
+import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 public class AutoDonor extends JavaPlugin {
@@ -29,6 +30,7 @@ public class AutoDonor extends JavaPlugin {
 	ConcurrentHashMap<UUID, DonorData> _donorData = new ConcurrentHashMap<UUID, DonorData>();
 	PlayerDataCache _playerDataCache = new PlayerDataCache();
 	public static Permission _permissions;
+	public static Economy _economy;
 	private int _checkInterval = 15 * 20;
 	ArrayList<Integer> _processedPayments;
 	private int _giveAPI;
@@ -82,6 +84,7 @@ public class AutoDonor extends JavaPlugin {
 		
 		//Set config values and connect to Vault's Permission class.
 		setupPermissions();
+		setupEconomy();
 		_checkInterval = getConfig().getInt("checkInterval") * 20;
 		_apiURL = getConfig().getString("apiURL");
 		
@@ -136,5 +139,9 @@ public class AutoDonor extends JavaPlugin {
         _permissions = rsp.getProvider();
     }
 	
+	private void setupEconomy() {
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+		_economy = rsp.getProvider();
+	}
 	
 }

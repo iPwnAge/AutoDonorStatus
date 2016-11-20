@@ -35,6 +35,9 @@ public class GiveAPI implements Runnable {
 	public void run() {
 		JSONObject donorList = getDonorList();
 		JSONArray donations = (JSONArray) donorList.get("donations");
+		if(donations == null) {
+			return;
+		}
         Iterator<JSONObject> i = donations.iterator();
         while (i.hasNext()) {
         	JSONObject donation = i.next();

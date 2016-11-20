@@ -23,6 +23,16 @@ public class PlayerDataCache {
 		return _UUIDtoUsername.get(playerUUID);
 	}
 	
+	public void removePlayer(UUID playerUUID) {
+		_UsernametoUUID.remove(_UUIDtoUsername.get(playerUUID));
+		_UUIDtoUsername.remove(playerUUID);
+	}
+	
+	public void removePlayer(String playerName) {
+		_UUIDtoUsername.remove(_UsernametoUUID.get(playerName));
+		_UsernametoUUID.remove(playerName);
+	}
+	
 	public boolean isCached(UUID playerUUID) {
 		return _UUIDtoUsername.containsKey(playerUUID);
 	}

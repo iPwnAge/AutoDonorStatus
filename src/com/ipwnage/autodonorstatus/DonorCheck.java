@@ -27,6 +27,8 @@ public class DonorCheck implements Runnable {
 				_plugin.getLogger().info("Player " + _playerDataCache.getPlayerName(playerUUID) + " has exceeded their remaining Donor Status time. Removing them from the Donor List.");
 				_plugin.setDonorStatus(false, playerUUID, _playerDataCache.getPlayerName(playerUUID));
 				_donorData.remove(playerUUID);
+				_playerDataCache.removePlayer(playerUUID);
+				_plugin._data.set("players." + playerUUID, null);
 			}
 		}
 		
