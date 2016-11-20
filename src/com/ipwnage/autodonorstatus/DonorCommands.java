@@ -55,8 +55,16 @@ public class DonorCommands implements CommandExecutor {
 									});
 							return true;
 						}
+					} else {
+						sender.sendMessage(new String[]{
+								ChatColor.GREEN + "You currently do not have Donor Status. Interested in becoming a donor?",
+								ChatColor.GREEN + "You can do so via https://ipwnage.com/donate, or through the '/donor buy' command."
+								});
+						return true;
 					}
-				// End: player running /donor check and seeing their own donor status
+				} // End: player running /donor check and seeing their own donor status
+				
+						
 				} else { // Start: staff running /donor check <username> and seeing that player's donor status
 					if(!((Player) sender).hasPermission("autodonorstatus.admin")) {
 						sender.sendMessage(ChatColor.RED + "You do not have permission!");
@@ -116,7 +124,7 @@ public class DonorCommands implements CommandExecutor {
 				String playerName = ((Player) sender).getName();
 				
 				
-				if(args.length > 2) { //Start: /donor buy
+				if(args.length < 2) { //Start: /donor buy
 					sender.sendMessage(ChatColor.GREEN + "You can earn 30 days of Donor Status for " + ChatColor.YELLOW + "2250⛃" + ChatColor.GREEN + ". To confirm, type /donor buy confirm");
 					_confirmDB.add(((Player) sender).getUniqueId());
 					return true;
@@ -129,7 +137,7 @@ public class DonorCommands implements CommandExecutor {
 						if (_playerDataCache.isCached(playerUUID)) { //Player buys more time on an existing donor status
 							_donorData.get(playerUUID).setDays(_donorData.get(playerUUID).getDays() + 30);
 							sender.sendMessage(new String[] {
-									ChatColor.GREEN + "Awesome, I see you're extending your Donor Status by 30 days.",
+									ChatColor.GREEN + "Awesome, you're extending your Donor Status by 30 days.",
 									ChatColor.GREEN + "You now have Donor Status for " + _donorData.get(playerUUID).getDaysRemaining() + " days.",
 									ChatColor.GREEN + "Thanks for helping out, we really appreciate it!"
 							});

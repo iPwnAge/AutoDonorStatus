@@ -7,5 +7,3 @@ commands:
     donor:
         description: The command for controlling ADS in-game.
         usage: /donor <check, removedonor, adddonor> <params>
-        permission: autodonorstatus.admin
-        permission-message: You don't have permission to
