@@ -44,18 +44,14 @@ public class DonorData {
 	}
 	
 	public int getDaysRemaining() {
-		//There is definitely a better solution to this, I'll revisit this soon.
-		//TODO: make this more efficient.
 		/*
 		 * math logic: to get how many days are remaining, first find the difference between the amount of time that has
-		 * passed between _date and current time. make that a fraction, times it by a hundred to make it a percentage, then
-		 * times that percentage by _days to find out how many days have been consumed.
-		 * then, take _days and subtract the above answer from days to find out how many days are remaining.
-		 * 
-		 * wait, can't i just divide the amount of time that has passed between _date and current time and then subtract
-		 * that from _days?  commenting code = finding solutions. i'll implement that soon.
+		 * passed between _date and current time. divide that answer by 86400, which are how many seconds there are in a
+		 * day. this will give you the total amount of days that have elapsed since the donor purchase. just subtract that
+		 * from _days, and you've got your total remaining days left. casting to int because i don't want my users to see
+		 * "you've got 23.293587 days remaining"
 		 */
-		return  (int) (_days - ((((((System.currentTimeMillis() / 1000L) - _date)) / (86400L * _days)) *  100) * _days));
+		return  (int) (_days - (((System.currentTimeMillis() / 1000L) - _date) / 86400L));
 	}
 	
 	public String toString() {
