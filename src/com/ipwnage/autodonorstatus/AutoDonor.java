@@ -17,7 +17,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.ipwnage.autodonorstatus.DonorData;
+import com.ipwnage.autodonorstatus.util.DonorData;
+import com.ipwnage.autodonorstatus.util.PlayerDataCache;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;

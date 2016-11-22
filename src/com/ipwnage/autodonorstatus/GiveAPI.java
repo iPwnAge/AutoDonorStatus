@@ -17,6 +17,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.ipwnage.autodonorstatus.util.DonorData;
+
 import static java.lang.Math.toIntExact;
 
 

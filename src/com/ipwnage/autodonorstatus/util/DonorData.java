@@ -1,4 +1,4 @@
-package com.ipwnage.autodonorstatus;
+package com.ipwnage.autodonorstatus.util;
 
 public class DonorData {
 	private int _date;

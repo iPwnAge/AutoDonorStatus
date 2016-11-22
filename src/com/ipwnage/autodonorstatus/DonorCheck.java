@@ -4,6 +4,9 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ipwnage.autodonorstatus.util.DonorData;
+import com.ipwnage.autodonorstatus.util.PlayerDataCache;
+
 public class DonorCheck implements Runnable {
 	
 	private AutoDonor _plugin;

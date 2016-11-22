@@ -1,4 +1,4 @@
-package com.ipwnage.autodonorstatus;
+package com.ipwnage.autodonorstatus.util;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
