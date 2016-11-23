@@ -39,6 +39,7 @@ public class DonorCommands implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(args.length == 0) {
 			sender.sendMessage(ChatColor.RED + "Whoops, incorrect syntax!");
+			return true;
 		}
 		//Start: /donor check command
 		if(args[0].equals("check")) {
@@ -73,14 +74,14 @@ public class DonorCommands implements CommandExecutor {
 
 				} else { // Start: staff running /donor check <username> and seeing that player's donor status
 					if(!((Player) sender).hasPermission("autodonorstatus.admin")) {
-						sender.sendMessage(ChatColor.RED + "You do not have permission!");
+						sender.sendMessage(ChatColor.RED + "You do not have permission to check other players.");
 						return true; 
 					}
 					if(_playerDataCache.isCached(args[1])) {
 						DonorData playerDonorData = _donorData.get(_playerDataCache.getPlayerUUID(args[1]));
 						if(playerDonorData.isDonor()) {
 							if(playerDonorData.getDays() == 0) {
-								sender.sendMessage(ChatColor.GREEN + args[1] + " has donated money. They have permanent Donor Status.");
+								sender.sendMessage(ChatColor.GREEN + args[1] + " has permanent Donor Status.");
 								return true;
 							} else {
 								sender.sendMessage(ChatColor.GREEN + args[1] + " has " + playerDonorData.getDaysRemaining() + " days remaining.");
@@ -105,18 +106,18 @@ public class DonorCommands implements CommandExecutor {
 					DonorData playerDonorData = _donorData.get(_playerDataCache.getPlayerUUID(args[1]));
 					if(playerDonorData.isDonor()) {
 						if(playerDonorData.getDays() == 0) {
-							sender.sendMessage(ChatColor.GREEN + args[1] + " has donated money. They have permanent Donor Status.");
+							sender.sendMessage(ChatColor.GREEN + args[1] + " has permanent Donor Status.");
 							return true;
 						} else {
 							sender.sendMessage(ChatColor.GREEN + args[1] + " has " + playerDonorData.getDaysRemaining() + " days remaining");
 							return true;
 						} 
 					} else {
-						sender.sendMessage(ChatColor.GREEN + args[1] + " does not have donor status.");
+						sender.sendMessage(ChatColor.GREEN + args[1] + " does not have Donor Status.");
 						return true;
 					}
 				}
-				sender.sendMessage(ChatColor.GREEN + args[1] + " does not have donor status.");
+				sender.sendMessage(ChatColor.GREEN + args[1] + " does not have Donor Status.");
 				return true;
 
 			} //End: Console /donor check
@@ -128,6 +129,10 @@ public class DonorCommands implements CommandExecutor {
 			if(sender instanceof Player) {
 				UUID playerUUID = ((Player) sender).getUniqueId();
 				String playerName = ((Player) sender).getName();
+				if(_playerDataCache.isCached(playerUUID) && _donorData.get(playerUUID).getDaysRemaining() == 0) {
+					sender.sendMessage(ChatColor.GREEN + "You're already have permanent Donor Status!");
+					return true;
+				}
 
 
 				if(args.length < 2) { //Start: /donor buy
@@ -173,11 +178,36 @@ public class DonorCommands implements CommandExecutor {
 		} //End: /donor buy command
 
 		if(args[0].equals("set")) { //Start: /donor set command
+			if(!((Player) sender).hasPermission("autodonorstatus.admin")) {
+				sender.sendMessage(ChatColor.RED + "You do not have permission to set other players' DS.");
+				return true; 
+			}
 			if(args.length > 2)  { //Start: /donor set <player> true <time>
 				String playerName = args[1];
 				int playerDonorTime = Integer.valueOf(args[2]);
 				if(_playerDataCache.isCached(playerName)) {
-					// Existing player, probably going to add 
+					// Existing player
+					UUID playerUUID = Bukkit.getPlayer(playerName).getUniqueId();
+					if(playerDonorTime > 0) {
+						sender.sendMessage(ChatColor.GREEN + "Successfully set " + Bukkit.getPlayer(playerName).getDisplayName() + "'s Donor Status for " + playerDonorTime + " days.");
+						Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Awesome, you now have Donor Status for " + playerDonorTime + " days. Thanks for helping out!");
+						_donorData.put(playerUUID, new DonorData(playerName, (int) (System.currentTimeMillis() / 1000L), playerDonorTime));
+						_plugin.setDonorStatus(true, playerUUID, playerName);
+						return true;
+					} else if (playerDonorTime == 0){
+						sender.sendMessage(ChatColor.GREEN + "Successfully set " + Bukkit.getPlayer(playerName).getDisplayName() + "'s permanent Donor Status.");
+						Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Awesome, you now have permanent Donor Status. Thanks for helping out!");
+						_donorData.put(playerUUID, new DonorData(playerName, (int) (System.currentTimeMillis() / 1000L), 0));
+						_plugin.setDonorStatus(true, playerUUID, playerName);
+						return true;
+					} else {
+						_donorData.remove(playerUUID);
+						_playerDataCache.removePlayer(playerUUID);
+						_plugin.setDonorStatus(false, playerUUID, playerName);
+						_plugin._data.set("players." + playerUUID, null);
+						sender.sendMessage(ChatColor.GREEN + "Successfully removed " + Bukkit.getPlayer(playerName).getDisplayName() + "'s Donor Status.");
+						return true;
+					}
 				} else if(Bukkit.getPlayer(playerName).isOnline()){ //New player being added, for the moment requires the player to be online
 					UUID playerUUID = Bukkit.getPlayer(playerName).getUniqueId();
 					if(playerDonorTime > 0) {
@@ -186,18 +216,17 @@ public class DonorCommands implements CommandExecutor {
 						_donorData.put(playerUUID, new DonorData(playerName, (int) (System.currentTimeMillis() / 1000L), playerDonorTime));
 						_playerDataCache.addPlayer(playerUUID, playerName);
 						_plugin.setDonorStatus(true, playerUUID, playerName);
+						return true;
 					} else if (playerDonorTime == 0){
 						sender.sendMessage(ChatColor.GREEN + "Successfully set " + Bukkit.getPlayer(playerName).getDisplayName() + "'s permanent Donor Status.");
 						Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Awesome, you now have permanent Donor Status. Thanks for helping out!");
 						_donorData.put(playerUUID, new DonorData(playerName, (int) (System.currentTimeMillis() / 1000L), 0));
 						_playerDataCache.addPlayer(playerUUID, playerName);
 						_plugin.setDonorStatus(true, playerUUID, playerName);
+						return true;
 					} else {
-						_donorData.remove(playerUUID);
-						_playerDataCache.removePlayer(playerUUID);
-						_plugin.setDonorStatus(false, playerUUID, playerName);
-						sender.sendMessage(ChatColor.GREEN + "Successfully removed " + Bukkit.getPlayer(playerName).getDisplayName() + "'s Donor Status.");
-						_plugin._data.set("players." + playerUUID, null);
+						sender.sendMessage(ChatColor.RED + "You cannot remove Donor Status on a player that does not have Donor Status!");
+						return true;
 					}
 					
 				} //End: Proper /donor set <player> <time> syntax
@@ -209,6 +238,7 @@ public class DonorCommands implements CommandExecutor {
 						ChatColor.RED + "For example: /donor set John -1",
 						ChatColor.RED + "Use 0 for permanent DS, -1 to remove DS."
 				});
+				return true;
 			} //End: Error for improper "true" syntax.
 		}
 

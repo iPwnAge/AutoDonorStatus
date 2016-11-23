@@ -16,7 +16,7 @@ public class PlayerDataCache {
 	}
 	
 	public UUID getPlayerUUID(String playerName) {
-		return _UsernametoUUID.get(playerName);
+		return _UsernametoUUID.get(playerName.toLowerCase());
 	}
 	
 	public String getPlayerName(UUID playerUUID) {

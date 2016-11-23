@@ -73,7 +73,6 @@ public class AutoDonor extends JavaPlugin {
 				DonorData donorData = new DonorData((String) _data.get("players."+key));
 				UUID playerUUID = UUID.fromString(key);
 				_donorData.put(playerUUID, donorData );
-				getLogger().info("giving addPlayer UUID: " + playerUUID + " and playerName: " + donorData.getName());
 				_playerDataCache.addPlayer(playerUUID, donorData.getName());
 				}
 			getLogger().info("Loaded " + _donorData.size() + " player's donation data.");
