@@ -38,7 +38,7 @@ public class DonorCommands implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(args.length == 0) {
-			sender.sendMessage(ChatColor.RED + "Whoops, incorrect syntax!");
+			sender.sendMessage(ChatColor.RED + "Whoops, incorrect syntax! Try '/donor check' for starters.");
 			return true;
 		}
 		//Start: /donor check command
@@ -59,14 +59,14 @@ public class DonorCommands implements CommandExecutor {
 						} else {
 							sender.sendMessage(new String[]{
 									ChatColor.GREEN + "You currently do not have Donor Status. Interested in becoming a donor?",
-									ChatColor.GREEN + "You can do so via https://ipwnage.com/donate, or through the '/donor buy' command."
+									ChatColor.GREEN + "You can do so via https://ipwnage.com/donate, or through the '/donor buy' command to  use in-game money."
 							});
 							return true;
 						}
 					} else {
 						sender.sendMessage(new String[]{
 								ChatColor.GREEN + "You currently do not have Donor Status. Interested in becoming a donor?",
-								ChatColor.GREEN + "You can do so via https://ipwnage.com/donate, or through the '/donor buy' command."
+								ChatColor.GREEN + "You can do so via https://ipwnage.com/donate, or through the '/donor buy' command to  use in-game money."
 						});
 						return true;
 					} // End: player running /donor check and seeing their own donor status
@@ -136,7 +136,7 @@ public class DonorCommands implements CommandExecutor {
 
 
 				if(args.length < 2) { //Start: /donor buy
-					sender.sendMessage(ChatColor.GREEN + "You can earn 30 days of Donor Status for " + ChatColor.YELLOW + "2250⛃" + ChatColor.GREEN + ". To confirm, type /donor buy confirm");
+					sender.sendMessage(ChatColor.GREEN + "You can earn 30 days of Donor Status for " + ChatColor.YELLOW + "1200⛃" + ChatColor.GREEN + ". To confirm, type /donor buy confirm");
 					_confirmDB.add(((Player) sender).getUniqueId());
 					return true;
 					//End: /donor buy
@@ -144,7 +144,7 @@ public class DonorCommands implements CommandExecutor {
 
 				} else if (args[1].equals("confirm")) { //Start: /donor buy confirm
 					if(_confirmDB.contains(playerUUID)) {
-						if(_economy.getBalance(sender.getName()) >= 2250) { //Start: player has enough money to buy donor
+						if(_economy.getBalance(sender.getName()) >= 1200) { //Start: player has enough money to buy donor
 							if (_playerDataCache.isCached(playerUUID)) { //Player buys more time on an existing donor status
 								_donorData.get(playerUUID).setDays(_donorData.get(playerUUID).getDays() + 30);
 								sender.sendMessage(new String[] {
@@ -152,18 +152,18 @@ public class DonorCommands implements CommandExecutor {
 										ChatColor.GREEN + "You now have Donor Status for " + _donorData.get(playerUUID).getDaysRemaining() + " days.",
 										ChatColor.GREEN + "Thanks for helping out, we really appreciate it!"
 								});
-								_economy.withdrawPlayer(playerName, 2250);
+								_economy.withdrawPlayer(playerName, 1200);
 
 							} else { //Player is new to donor status
 								_donorData.put(playerUUID, new DonorData(playerName, (int) (System.currentTimeMillis() / 1000L), 30));
 								_playerDataCache.addPlayer(playerUUID, playerName);
 								_plugin.setDonorStatus(true, playerUUID, playerName);
 								sender.sendMessage(ChatColor.GREEN + "Awesome, you now have Donor Status for the next 30 days. Thanks for helping out!");
-								_economy.withdrawPlayer(playerName, 2250);
+								_economy.withdrawPlayer(playerName, 1200);
 							}
 							//End: player has enough money to buy donor
 						} else { //Start: not enough protos error message
-							sender.sendMessage(ChatColor.RED + "You do not have enough Protos to buy 30 days of Donor Status. You need a total of " + ChatColor.YELLOW + "2250⛃" + ChatColor.RED + ".");	
+							sender.sendMessage(ChatColor.RED + "You do not have enough Protos to buy 30 days of Donor Status. You need a total of " + ChatColor.YELLOW + "1200⛃" + ChatColor.RED + ".");	
 						}
 						_confirmDB.remove(playerUUID);
 						return true;
