@@ -34,7 +34,6 @@ public class AutoDonor extends JavaPlugin {
 	public static Economy _economy;
 	private int _checkInterval = 15 * 20;
 	ArrayList<Integer> _processedPayments;
-	private int _giveAPI;
 	String _apiURL = "";
 	
 	@Override
@@ -89,7 +88,8 @@ public class AutoDonor extends JavaPlugin {
 		_apiURL = getConfig().getString("apiURL");
 		
 		//Async task for checking the web API
-		_giveAPI = this.getServer().getScheduler().runTaskTimerAsynchronously(this, new GiveAPI(this), _checkInterval, _checkInterval).getTaskId(); 
+		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new GiveAPI(this), _checkInterval, _checkInterval);
+		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new DonorCheck(this), 0, 6000);
 		this.getCommand("donor").setExecutor(new DonorCommands(this));
 		getLogger().info("Successfully started AutoDonor.");
 		return;
